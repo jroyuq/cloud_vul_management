@@ -5,6 +5,7 @@ Module de parsing des rapports Trivy
 """
 
 import json
+import csv
 import logging
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -13,40 +14,114 @@ logger = logging.getLogger(__name__)
 
 
 class TrivyParser:
-    """Parser pour les rapports JSON de Trivy"""
+    """Parser pour les rapports JSON et CSV de Trivy"""
     
     def __init__(self, report_path: str):
         """
         Initialise le parser
         
         Args:
-            report_path: Chemin vers le rapport JSON Trivy
+            report_path: Chemin vers le rapport Trivy (JSON ou CSV)
         """
         self.report_path = Path(report_path)
         self.data = None
         self.cve_list = []
+        self.format = self._detect_format()
+    
+    def _detect_format(self) -> str:
+        """
+        Détecte le format du rapport (JSON ou CSV)
+        
+        Returns:
+            'json' ou 'csv'
+        """
+        if self.report_path.suffix.lower() == '.csv':
+            return 'csv'
+        return 'json'
     
     def load_report(self) -> bool:
         """
-        Charge le rapport Trivy depuis le fichier JSON
+        Charge le rapport Trivy (JSON ou CSV)
         
         Returns:
             True si le chargement réussit, False sinon
         """
         try:
-            logger.info(f"Chargement du rapport Trivy: {self.report_path}")
-            with open(self.report_path, "r", encoding="utf-8") as f:
-                self.data = json.load(f)
-            logger.info("✓ Rapport Trivy chargé avec succès")
-            return True
+            logger.info(f"Chargement du rapport Trivy ({self.format.upper()}): {self.report_path}")
+            
+            if self.format == 'csv':
+                return self._load_csv()
+            else:
+                return self._load_json()
+                
         except FileNotFoundError:
             logger.error(f"✗ Fichier introuvable: {self.report_path}")
             return False
+        except Exception as e:
+            logger.error(f"✗ Erreur inattendue: {e}")
+            return False
+    
+    def _load_json(self) -> bool:
+        """
+        Charge un rapport JSON
+        
+        Returns:
+            True si le chargement réussit
+        """
+        try:
+            with open(self.report_path, "r", encoding="utf-8") as f:
+                self.data = json.load(f)
+            logger.info("✓ Rapport JSON chargé avec succès")
+            return True
         except json.JSONDecodeError as e:
             logger.error(f"✗ Erreur de parsing JSON: {e}")
             return False
+    
+    def _load_csv(self) -> bool:
+        """
+        Charge un rapport CSV et le convertit en format JSON-like
+        
+        Returns:
+            True si le chargement réussit
+        """
+        try:
+            with open(self.report_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+            
+            # Convertir le CSV en structure JSON-like
+            self.data = {"Results": []}
+            
+            # Grouper par Target
+            targets = {}
+            for row in rows:
+                target = row.get('Target', 'Unknown')
+                if target not in targets:
+                    targets[target] = []
+                
+                # Créer une entrée de vulnérabilité
+                vuln = {
+                    'VulnerabilityID': row.get('Vulnerability ID', row.get('CVE', '')),
+                    'PkgName': row.get('Package', row.get('PkgName', 'N/A')),
+                    'InstalledVersion': row.get('Installed Version', row.get('InstalledVersion', 'N/A')),
+                    'FixedVersion': row.get('Fixed Version', row.get('FixedVersion', 'N/A')),
+                    'Severity': row.get('Severity', 'UNKNOWN'),
+                    'Title': row.get('Title', 'N/A'),
+                    'Description': row.get('Description', 'N/A')
+                }
+                targets[target].append(vuln)
+            
+            # Créer la structure Results
+            for target, vulns in targets.items():
+                self.data['Results'].append({
+                    'Target': target,
+                    'Vulnerabilities': vulns
+                })
+            
+            logger.info(f"✓ Rapport CSV chargé avec succès ({len(rows)} lignes)")
+            return True
         except Exception as e:
-            logger.error(f"✗ Erreur inattendue: {e}")
+            logger.error(f"✗ Erreur de parsing CSV: {e}")
             return False
     
     def extract_cves(self, min_severity: Optional[str] = None) -> List[Dict]:

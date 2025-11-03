@@ -38,16 +38,21 @@ ENV/
 *.log
 trivy_analysis.log
 
-# Output
-output/
-*.csv
-*.pdf
-*.png
-
 # Configuration
 .env
-*.json
-!exemple_rapport_trivy.json
+api_config.py
+
+# Rapports Trivy d'entrée (ne pas versionner vos rapports)
+rapport_vulnerabilites.json
+rapport_vulnerabilites.csv
+rapport_trivy_*.json
+rapport_trivy_*.csv
+
+# Output (rapports générés)
+output/
+output/*.csv
+output/*.pdf
+output/*.png
 
 # Temporary files
 *.tmp

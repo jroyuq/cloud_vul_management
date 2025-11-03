@@ -15,7 +15,7 @@ class Config:
     """Configuration de l'application"""
     
     # Chemins des fichiers
-    trivy_report_path: str = "rapport_vulnerabilites.json"
+    trivy_report_path: str = "rapport_vulnerabilites.json"  # Peut être .json ou .csv
     output_dir: str = "output"
     
     # API NVD
@@ -43,15 +43,24 @@ class Config:
     @classmethod
     def from_env(cls) -> 'Config':
         """
-        Crée une configuration depuis les variables d'environnement
+        Crée une configuration depuis les variables d'environnement ou api_config.py
         
         Returns:
             Instance de Config
         """
+        # Essayer de charger la clé depuis api_config.py
+        api_key = os.getenv("NVD_API_KEY")
+        if not api_key:
+            try:
+                from api_config import NVD_API_KEY
+                api_key = NVD_API_KEY
+            except ImportError:
+                pass  # Pas de fichier api_config.py
+        
         return cls(
             trivy_report_path=os.getenv("TRIVY_REPORT", "rapport_vulnerabilites.json"),
             output_dir=os.getenv("OUTPUT_DIR", "output"),
-            nvd_api_key=os.getenv("NVD_API_KEY"),
+            nvd_api_key=api_key,
             rate_limit_delay=float(os.getenv("RATE_LIMIT_DELAY", "0.6")),
             log_level=os.getenv("LOG_LEVEL", "INFO")
         )

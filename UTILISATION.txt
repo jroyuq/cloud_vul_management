@@ -1,0 +1,72 @@
+═══════════════════════════════════════════════════════════════
+  GUIDE D'UTILISATION - Analyseur Trivy + NVD
+═══════════════════════════════════════════════════════════════
+
+📋 ÉTAPES D'UTILISATION :
+
+1. CONFIGURER LA CLÉ API (UNE SEULE FOIS)
+   ----------------------------------------
+   • Ouvrez le fichier : api_config.py
+   • Remplacez "VOTRE_CLE_API_ICI" par votre vraie clé API
+   • Sauvegardez le fichier
+   
+   ⚠️ IMPORTANT : Ce fichier ne sera JAMAIS envoyé sur Git (sécurité)
+
+
+2. PLACER VOTRE RAPPORT TRIVY
+   ---------------------------
+   Le script accepte les formats JSON ET CSV !
+   
+   Option A - Rapport JSON :
+   • Copiez votre rapport .json généré par Trivy
+   • Renommez-le en : rapport_vulnerabilites.json
+   • Placez-le dans ce dossier (même niveau que main.py)
+   
+   Option B - Rapport CSV :
+   • Copiez votre rapport .csv généré par Trivy
+   • Renommez-le en : rapport_vulnerabilites.csv
+   • Placez-le dans ce dossier (même niveau que main.py)
+   
+   ⚠️ Si vous avez les DEUX formats, le script utilisera le JSON par défaut
+
+
+3. EXÉCUTER L'ANALYSE
+   -------------------
+   Dans PowerShell, exécutez :
+   
+   python main.py
+
+
+4. CONSULTER LES RÉSULTATS
+   ------------------------
+   Les rapports sont générés dans le dossier : output/
+   
+   • rapport_vulnerabilites_*.csv  → Données complètes
+   • rapport_vulnerabilites_*.pdf  → Rapport professionnel
+   • visualisations_*.png          → Graphiques
+   • trivy_analysis.log            → Logs de l'analyse
+
+
+═══════════════════════════════════════════════════════════════
+
+📁 STRUCTURE DU PROJET :
+
+Script_trivy/
+├── main.py                         ← Point d'entrée
+├── api_config.py                   ← 🔑 VOTRE CLÉ API ICI
+├── rapport_vulnerabilites.json     ← Votre rapport Trivy
+├── config.py                       ← Configuration
+├── trivy_parser.py                 ← Parser Trivy
+├── nvd_client.py                   ← Client API NVD
+├── report_generator.py             ← Génération rapports
+└── output/                         ← Résultats générés
+
+═══════════════════════════════════════════════════════════════
+
+🔒 SÉCURITÉ :
+
+✅ api_config.py est dans .gitignore (ne sera pas versionné)
+✅ Votre clé API reste privée
+✅ Les rapports générés ne sont pas versionnés
+
+═══════════════════════════════════════════════════════════════
