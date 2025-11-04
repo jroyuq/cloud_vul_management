@@ -100,11 +100,17 @@ class TrivyParser:
                     targets[target] = []
                 
                 # Créer une entrée de vulnérabilité
+                # Chercher le CVE dans différentes colonnes possibles
+                cve_id = (row.get('Vulnerability ID') or 
+                         row.get('CVE') or 
+                         row.get('Vulnerability') or 
+                         row.get('VulnerabilityID') or '')
+                
                 vuln = {
-                    'VulnerabilityID': row.get('Vulnerability ID', row.get('CVE', '')),
-                    'PkgName': row.get('Package', row.get('PkgName', 'N/A')),
-                    'InstalledVersion': row.get('Installed Version', row.get('InstalledVersion', 'N/A')),
-                    'FixedVersion': row.get('Fixed Version', row.get('FixedVersion', 'N/A')),
+                    'VulnerabilityID': cve_id,
+                    'PkgName': row.get('Package') or row.get('Library') or row.get('PkgName') or 'N/A',
+                    'InstalledVersion': row.get('Installed Version') or row.get('InstalledVersion') or 'N/A',
+                    'FixedVersion': row.get('Fixed Version') or row.get('FixedVersion') or 'N/A',
                     'Severity': row.get('Severity', 'UNKNOWN'),
                     'Title': row.get('Title', 'N/A'),
                     'Description': row.get('Description', 'N/A')

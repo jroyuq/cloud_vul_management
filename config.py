@@ -14,7 +14,7 @@ from typing import Optional
 class Config:
     """Configuration de l'application"""
     
-    # Chemins des fichiers
+    # Chemins des fichiers (détection automatique si non spécifié)
     trivy_report_path: str = "rapport_vulnerabilites.json"  # Peut être .json ou .csv
     output_dir: str = "output"
     

@@ -13,21 +13,23 @@
    ⚠️ IMPORTANT : Ce fichier ne sera JAMAIS envoyé sur Git (sécurité)
 
 
-2. PLACER VOTRE RAPPORT TRIVY
-   ---------------------------
-   Le script accepte les formats JSON ET CSV !
+2. PLACER VOTRE RAPPORT TRIVY (FORMAT CSV)
+   ----------------------------------------
    
-   Option A - Rapport JSON :
-   • Copiez votre rapport .json généré par Trivy
-   • Renommez-le en : rapport_vulnerabilites.json
-   • Placez-le dans ce dossier (même niveau que main.py)
+   ✨ DÉTECTION AUTOMATIQUE ✨
+   • Placez simplement votre rapport Trivy CSV dans ce dossier
+   • Le script détectera automatiquement N'IMPORTE QUEL fichier .csv
+   • Aucun besoin de renommer !
    
-   Option B - Rapport CSV :
-   • Copiez votre rapport .csv généré par Trivy
-   • Renommez-le en : rapport_vulnerabilites.csv
-   • Placez-le dans ce dossier (même niveau que main.py)
+   Exemples de noms acceptés :
+   • rapport_docker.csv ✅
+   • scan.csv ✅
+   • vulnerabilites.csv ✅
+   • mon_rapport.csv ✅
+   • N'importe quel nom avec l'extension .csv ✅
    
-   ⚠️ Si vous avez les DEUX formats, le script utilisera le JSON par défaut
+   ⚠️ Si plusieurs fichiers CSV existent, le premier trouvé sera utilisé
+   ⚠️ Les fichiers dans le dossier output/ sont automatiquement ignorés
 
 
 3. EXÉCUTER L'ANALYSE

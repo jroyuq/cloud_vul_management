@@ -11,6 +11,7 @@ import logging
 import time
 import pandas as pd
 from pathlib import Path
+from typing import Optional
 
 from config import Config
 from trivy_parser import TrivyParser
@@ -104,6 +105,31 @@ def enrich_cves_with_nvd(cve_list: list, nvd_client: NVDClient, rate_limit: floa
     return df
 
 
+def find_trivy_report() -> Optional[str]:
+    """
+    Cherche automatiquement un rapport Trivy CSV dans le dossier courant
+    
+    Returns:
+        Chemin du rapport trouvé ou None
+    """
+    logger = logging.getLogger(__name__)
+    current_dir = Path(".")
+    
+    # Chercher tous les fichiers CSV (n'importe quel nom)
+    found_files = list(current_dir.glob("*.csv"))
+    
+    # Exclure les fichiers dans output/
+    found_files = [f for f in found_files if "output" not in str(f)]
+    
+    if found_files:
+        # Prendre le premier fichier trouvé
+        report_path = str(found_files[0])
+        logger.info(f"📁 Rapport CSV détecté automatiquement: {report_path}")
+        return report_path
+    
+    return None
+
+
 def main():
     """
     Fonction principale
@@ -121,11 +147,18 @@ def main():
     logger.info("DÉMARRAGE DE L'ANALYSE TRIVY + NVD")
     logger.info("="*60)
     
+    # Chercher automatiquement un rapport Trivy
+    auto_report = find_trivy_report()
+    if auto_report:
+        config.trivy_report_path = auto_report
+        logger.info(f"✓ Utilisation du rapport: {auto_report}")
+    
     # Validation de la configuration
     if not config.validate():
-        logger.error(f"✗ Fichier Trivy introuvable: {config.trivy_report_path}")
-        logger.info("💡 Générez un rapport Trivy avec:")
-        logger.info("   trivy image -f json -o rapport_vulnerabilites.json <image>")
+        logger.error(f"✗ Aucun fichier CSV trouvé dans le dossier")
+        logger.info("💡 Placez un rapport Trivy au format CSV dans ce dossier")
+        logger.info("   Le script détectera automatiquement n'importe quel fichier .csv")
+        logger.info("   Exemples: rapport_docker.csv, scan.csv, vulnerabilites.csv, etc.")
         return 1
     
     # Vérification de la clé API
