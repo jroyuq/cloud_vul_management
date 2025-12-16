@@ -181,16 +181,4 @@ python extract_targets.py
 
 Voir le fichier [EXTRACT_TARGETS_README.md](https://www.google.com/search?q=EXTRACT_TARGETS_README.md) pour plus de détails sur le format de sortie.
 
-##Structure du Projet```
-Script_trivy/
-├── api_config.py             # ⚠️ CLÉ API (NON versionné)
-├── targets.csv               # Liste des cibles pour scan_all.py
-├── trivy_parser.py           # Logic: Parser Trivy
-├── nvd_client.py             # Logic: Client API NVD
-├── repriorise.py             # Logic: Script de repriorisation
-├── requirements.txt
-├── scans/                    # 📂 Sorties JSON brutes de Trivy
-├── processed/                # 📂 CSV intermédiaires (après Parse/Enrich)
-└── rapports/                 # 📂 Rapports finaux (CSV, XLSX, PDF)
-
 ```
