@@ -1,6 +1,4 @@
-Absolument. Voici la version finale du fichier `README.md`, structurée en un seul bloc de code Markdown, prête à être copiée et collée directement dans l'interface d'édition GitHub pour une visualisation parfaite.
 
-Ce formatage a été nettoyé, corrigé et optimisé pour la clarté technique.
 
 ```markdown
 # 🛡️ Analyseur Trivy + NVD (cloud_vul_management)
